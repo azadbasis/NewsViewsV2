@@ -1,8 +1,17 @@
 package com.newsviewsv2;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,9 +21,39 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.newsviewsv2.adapter.DataItemAdapter;
+import com.newsviewsv2.model.Article;
+import com.newsviewsv2.services.MyService;
+import com.newsviewsv2.utils.NetworkHelper;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+
+    List<Article> mItemList;
+    RecyclerView mRecyclerView;
+    DataItemAdapter mItemAdapter;
+    boolean networkOk;
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+            mItemList =intent.getParcelableArrayListExtra(MyService.MY_SERVICE_PAYLOAD);
+            Toast.makeText(MainActivity.this,
+                    "Received " + mItemList.size() + " items from service",
+                    Toast.LENGTH_SHORT).show();
+            displayData();
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +66,9 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -40,6 +82,31 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+
+
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean grid = settings.getBoolean(getString(R.string.pref_display_grid), false);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.rvItems);
+        if (grid) {
+            mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        }
+
+
+        networkOk = NetworkHelper.hasNetworkAccess(this);
+        if (networkOk) {
+            Intent intent = new Intent(this, MyService.class);
+            startService(intent);
+        } else {
+            Toast.makeText(this, "Network not available", Toast.LENGTH_SHORT).show();
+        }
+
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .registerReceiver(mBroadcastReceiver,
+                        new IntentFilter(MyService.MY_SERVICE_MESSAGE));
+
     }
 
     @Override
@@ -50,6 +117,20 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+    private void displayData() {
+        if (mItemList != null) {
+            mItemAdapter = new DataItemAdapter(this, mItemList);
+            mRecyclerView.setAdapter(mItemAdapter);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -68,6 +149,9 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            // Show the settings screen
+            Intent settingsIntent = new Intent(this, PrefsActivity.class);
+            startActivity(settingsIntent);
             return true;
         }
 
