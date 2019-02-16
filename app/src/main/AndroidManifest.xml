@@ -16,6 +16,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <activity android:name=".PopActivity"
+            android:theme="@style/AppTheme.MyPop"/>
+        <activity
+            android:name=".DetailActivity"
+            android:parentActivityName=".MainActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".PrefsActivity"
             android:parentActivityName=".MainActivity">
@@ -23,6 +32,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
         <service
             android:name=".services.MyService"
             android:exported="false" />

@@ -13,6 +13,7 @@ import com.newsviewsv2.model.Source;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -37,6 +38,7 @@ public class MyService extends IntentService {
 
         DataItem dataItem;
         ArrayList<Article> articles;
+
 
         try {
             dataItem = call.execute().body();
