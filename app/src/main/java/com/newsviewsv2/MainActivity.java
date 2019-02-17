@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -29,6 +32,8 @@ import com.newsviewsv2.model.Article;
 import com.newsviewsv2.services.MyService;
 import com.newsviewsv2.utils.NetworkHelper;
 
+import org.json.JSONArray;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,10 +41,13 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
 
-    List<Article> mItemList;
-    RecyclerView mRecyclerView;
-    DataItemAdapter mItemAdapter;
-    boolean networkOk;
+    private List<Article> mItemList;
+    private RecyclerView mRecyclerView;
+    private DataItemAdapter mItemAdapter;
+    private boolean networkOk;
+    private SwipeRefreshLayout swipeContainer;
+
+
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -61,18 +69,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        networkOk = NetworkHelper.hasNetworkAccess(this);
 
 
-
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -95,7 +94,6 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        networkOk = NetworkHelper.hasNetworkAccess(this);
         if (networkOk) {
             Intent intent = new Intent(this, MyService.class);
             startService(intent);
@@ -106,6 +104,42 @@ public class MainActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(getApplicationContext())
                 .registerReceiver(mBroadcastReceiver,
                         new IntentFilter(MyService.MY_SERVICE_MESSAGE));
+
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code here
+                Toast.makeText(getApplicationContext(), "Works!", Toast.LENGTH_LONG).show();
+                if (networkOk) {
+                    Intent intent = new Intent(MainActivity.this, MyService.class);
+                    startService(intent);
+                    mItemAdapter.clear();
+                    mItemAdapter.addAll(mItemList);
+                    Toast.makeText(MainActivity.this, "Network  available", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(MainActivity.this, "Network not available", Toast.LENGTH_SHORT).show();
+                }
+                // To keep animation for 4 seconds
+                new Handler().postDelayed(new Runnable() {
+                    @Override public void run() {
+                        // Stop animation (This will be after 3 seconds)
+
+                        swipeContainer.setRefreshing(false);
+                        Toast.makeText(MainActivity.this, "STOP", Toast.LENGTH_SHORT).show();
+                    }
+                }, 4000); // Delay in millis
+
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
 
     }
 
@@ -182,4 +216,6 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 }

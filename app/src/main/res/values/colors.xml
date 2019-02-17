@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="news_title">#4c4c4c</color>
+    <color name="white">#FFFFFFFF</color>
 
 </resources>
