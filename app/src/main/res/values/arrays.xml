@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="drawer_drop_down">
+        <item>MATH</item>
+        <item>TRIVIA</item>
+        <item>DATE</item>
+    </string-array>
+</resources>

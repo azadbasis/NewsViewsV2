@@ -75,8 +75,8 @@ public class WebActivity extends AppCompatActivity {
 
     private  void showSnackbar(){
         Snackbar snackbar = Snackbar
-                .make(findViewById(R.id.webLayout), "No internet connection!", Snackbar.LENGTH_LONG)
-                .setAction("RETRY", new View.OnClickListener() {
+                .make(findViewById(R.id.webLayout),  R.string.no_internet, Snackbar.LENGTH_LONG)
+                .setAction(R.string.retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                     }

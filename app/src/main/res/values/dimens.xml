@@ -15,4 +15,10 @@
     <dimen name="ic_album_overflow_margin_top">10dp</dimen>
     <dimen name="card_margin">5dp</dimen>
     <dimen name="card_album_radius">0dp</dimen>
+
+
+        <dimen name="toolbarElevation">4dp</dimen>
+        <dimen name="appBarTopMargin">0dp</dimen>
+        <dimen name="statusBarHeight">0dp</dimen>
+    <dimen name="statusBarElevation">4dp</dimen>
 </resources>

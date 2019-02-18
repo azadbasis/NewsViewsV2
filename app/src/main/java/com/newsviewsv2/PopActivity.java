@@ -82,12 +82,12 @@ public class PopActivity extends AppCompatActivity {
                 startActivity(myIntent);
             } catch (ActivityNotFoundException e) {
                 Toast.makeText(this, "No application can handle this request."
-                        + " Please install a webbrowser",  Toast.LENGTH_LONG).show();
+                        + " Please install a webBrowser",  Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
 
         }else{
-            Toast.makeText(this, "No internet connection!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_internet, Toast.LENGTH_SHORT).show();
         }
 
         finish();

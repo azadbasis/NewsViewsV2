@@ -69,6 +69,7 @@ public class DataItemAdapter extends RecyclerView.Adapter<DataItemAdapter.ViewHo
         holder.publishText.setText(publishNews);
 
         String urlToImage = item.getUrlToImage();
+        Picasso.get().setIndicatorsEnabled(true);
         try {
             Picasso.get()
                     .load(urlToImage)
@@ -116,15 +117,5 @@ public class DataItemAdapter extends RecyclerView.Adapter<DataItemAdapter.ViewHo
     }
 
 
-    // Clean all elements of the recycler
-    public void clear() {
-        mItems.clear();
-        notifyDataSetChanged();
-    }
 
-    // Add a list of items -- change to type used
-    public void addAll(List<Article> list) {
-        mItems.addAll(list);
-        notifyDataSetChanged();
-    }
 }
