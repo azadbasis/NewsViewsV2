@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.newsviewsv2.PopActivity;
 import com.newsviewsv2.R;
@@ -110,7 +109,7 @@ public class DataItemAdapter extends RecyclerView.Adapter<DataItemAdapter.ViewHo
 
             titleText = (TextView) itemView.findViewById(R.id.titleText);
             publishText = (TextView) itemView.findViewById(R.id.publishText);
-            imageView = (ImageView) itemView.findViewById(R.id.imageView);
+            imageView = (ImageView) itemView.findViewById(R.id.sentimentImage);
 
             mView = itemView;
         }

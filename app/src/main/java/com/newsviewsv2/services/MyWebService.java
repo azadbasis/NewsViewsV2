@@ -1,7 +1,6 @@
 package com.newsviewsv2.services;
 
 
-
 import com.newsviewsv2.model.DataItem;
 import com.newsviewsv2.utils.AppConstants;
 
@@ -36,7 +35,19 @@ public interface MyWebService {
     Call<String> trivia(@Path("number") String number);
 
     @GET("{month}/{day}/date")
-    Call<String> date(@Path("month") String month,@Path("day") String day);
+    Call<String> date(@Path("month") String month, @Path("day") String day);
+
+    @GET("{random}/date")
+    Call<String> randomDate(@Path("random") String random);
+
+    @GET("{random}/trivia")
+    Call<String> randomTrivia(@Path("random") String random);
+
+    @GET("{random}/year")
+    Call<String> randomYear(@Path("random") String random);
+
+    @GET("{random}/math")
+    Call<String> randomMath(@Path("random") String random);
 
 
 }

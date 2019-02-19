@@ -1,7 +1,12 @@
 package com.newsviewsv2.utils;
 
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.StrictMode;
 
+import java.io.IOException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,7 +41,7 @@ public class Operation {
     }
 
     public static String getDurationBreakdown(long millis) {
-        if(millis < 0) {
+        if (millis < 0) {
             throw new IllegalArgumentException("Duration must be greater than zero!");
         }
 
@@ -49,26 +54,55 @@ public class Operation {
         long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
 
         StringBuilder sb = new StringBuilder(64);
-        if(days>=1){
+        if (days >= 1) {
             sb.append(days);
             sb.append("d ");
         }
-        if(hours>=1){
+        if (hours >= 1) {
             sb.append(hours);
             sb.append("h ");
         }
-        long mMinutes=hours*60;
-       if(minutes<60&&minutes>=0&&minutes>mMinutes){
+        long mMinutes = hours * 60;
+        if (minutes < 60 && minutes >= 0 && minutes > mMinutes) {
 
-           sb.append(minutes);
-           sb.append("m ");
-       }
+            sb.append(minutes);
+            sb.append("m ");
+        }
 
-       // sb.append(seconds);
+        // sb.append(seconds);
         //sb.append(" Seconds");
 
-        return(sb.toString());
+        return (sb.toString());
     }
 
+
+    public static boolean isDate(String str) {
+        return str.matches("[+-]?\\d*(\\/\\d+)?");
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            double d = Double.parseDouble(str);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    public static Bitmap getFacebookProfilePicture(String userID){
+        Bitmap bitmap = null;
+        try {
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            URL imageURL = new URL("https://graph.facebook.com/" + userID + "/picture?type=large");
+            bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
 
 }

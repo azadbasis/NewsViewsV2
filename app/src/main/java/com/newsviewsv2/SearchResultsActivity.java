@@ -14,12 +14,14 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.PhoneNumberUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -28,7 +30,10 @@ import android.widget.Toast;
 
 import com.newsviewsv2.services.MyService;
 import com.newsviewsv2.services.MyWebService;
+import com.newsviewsv2.utils.App;
 import com.newsviewsv2.utils.NetworkHelper;
+import com.newsviewsv2.utils.Operation;
+import com.newsviewsv2.utils.Query;
 
 import java.util.Arrays;
 
@@ -40,22 +45,12 @@ import retrofit2.Response;
 public class SearchResultsActivity extends AppCompatActivity {
 
 
-    private TextView tvName, tvDescription, tvPrice;
-    private ImageView itemImage;
     private boolean networkOk;
+    private SearchView searchView;
+    private String setQueryHint;
+    private TextView messageText;
+    private ImageView sentimentImage,visibilityImage;
 
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-
-          /*  mItemList = intent.getParcelableArrayListExtra(MyService.MY_SERVICE_PAYLOAD);
-            Toast.makeText(MainActivity.this,
-                    "Received " + mItemList.size() + " items from service",
-                    Toast.LENGTH_SHORT).show();
-            displayData();*/
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,66 +64,19 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         setStatusBarColor(R.color.colorPrimaryDark);
 
+        messageText=(TextView)findViewById(R.id.messageText);
+        sentimentImage=(ImageView)findViewById(R.id.sentimentImage);
+        visibilityImage=(ImageView)findViewById(R.id.visibilityImage);
+
+
         networkOk = NetworkHelper.hasNetworkAccess(this);
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner_toolBar);
-
-
-        // set Spinner Adapter
-
-
         final ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.drawer_drop_down, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
+        spinnerConfig(spinner);
 
-        if (networkOk) {
-            Intent intent = new Intent(this, MyService.class);
-            startService(intent);
-        } else {
-            showSnackbar();
-        }
-
-        LocalBroadcastManager.getInstance(getApplicationContext())
-                .registerReceiver(mBroadcastReceiver,
-                        new IntentFilter(MyService.MY_SERVICE_MESSAGE));
-
-
-
-
-      /*  Article item = getIntent().getExtras().getParcelable(DataItemAdapter.ITEM_KEY);
-        if (item == null) {
-            throw new AssertionError("Null data item received!");
-        }
-
-*/
-
-    /*    tvName = (TextView) findViewById(R.id.tvItemName);
-        tvPrice = (TextView) findViewById(R.id.tvPrice);
-        tvDescription = (TextView) findViewById(R.id.tvDescription);
-        itemImage = (ImageView) findViewById(R.id.itemImage);
-
-        tvName.setText(item.getItemName());
-        tvDescription.setText(item.getDescription());
-        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.getDefault());
-        tvPrice.setText(nf.format(item.getPrice()));
-
-        InputStream inputStream = null;
-        try {
-            String imageFile = item.getImage();
-            inputStream = getAssets().open(imageFile);
-            Drawable d = Drawable.createFromStream(inputStream, null);
-            itemImage.setImageDrawable(d);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }*/
         handleIntent(getIntent());
     }
 
@@ -138,7 +86,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         inflater.inflate(R.menu.main, menu);
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
+        searchView =
                 (SearchView) menu.findItem(R.id.menu_search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
@@ -166,39 +114,91 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Toast.makeText(this, "QUERY: " + query, Toast.LENGTH_SHORT).show();
+            if (networkOk) {
+                requestData(query);
 
-            requestData(query);
-            //use the query to search
+            } else {
+                showSnackbar(getString(R.string.no_internet));
+                messageText.setText(getString(R.string.no_internet));
+                sentimentImage.setImageResource(R.drawable.ic_sentiment_dissatisfied_black_24dp);
+                visibilityImage.setImageResource(R.drawable.ic_visibility_off_black_24dp);
+            }
         }
     }
 
     private void requestData(String query) {
         MyWebService webService =
                 MyWebService.retrofitForNumber.create(MyWebService.class);
-        //Call<String> call = webService.math(query);
-        //sendRequest(call);
-//        Call<String> callTrivia = webService.trivia(query);
-//        sendRequest(callTrivia);
 
-        String string = "4/6";
-        String[] parts = string.split("/");
-        String part1 = parts[0]; // 4
-        String part2 = parts[1]; // 6
+        switch (App.query) {
+            case MATH_HINT:
+                if (Operation.isNumeric(query)) {
+                    Call<String> call = webService.math(query);
+                    sendRequest(call);
+                    break;
+                }
+            case TRIVIA_HINT:
+                if(Operation.isNumeric(query)) {
+                    Call<String> callTrivia = webService.trivia(query);
+                    sendRequest(callTrivia);
+                    break;
+                }
+            case DATE_HINT:
+                if (Operation.isDate(query)) {
+                    String[] parts = query.split("/");
+                    String part1 = parts[0]; // 4
+                    String part2 = parts[1]; // 6
+                    Call<String> callDate = webService.date(part1, part2);
+                    sendRequest(callDate);
 
-        Call<String> callDate = webService.date(part1,part2);
-        sendRequest(callDate);
+                    break;
+                }
+            case RANDOM_MATH_HINT:
+                if(Operation.isNumeric(query)) {
+                    Call<String> callRndmMath = webService.randomMath(query);
+                    sendRequest(callRndmMath);
+                    break;
+                }
+            case RANDOM_TRIVIA_HINT:
+                if(Operation.isNumeric(query)) {
+                    Call<String> callRndmTrivia = webService.randomTrivia(query);
+                    sendRequest(callRndmTrivia);
+                    break;
+                }
+
+            case RANDOM_DATE_HINT:
+                if(Operation.isNumeric(query)) {
+                    Call<String> callRndmDate = webService.randomDate(query);
+                    sendRequest(callRndmDate);
+                    break;
+                }
+            case RANDOM_YEAR_HINT:
+                if(Operation.isNumeric(query)) {
+                    Call<String> callRndmYear = webService.randomYear(query);
+                    sendRequest(callRndmYear);
+                    break;
+                }
+            default:
+
+                showSnackbar(getString(R.string.right_format));
+                messageText.setText(getString(R.string.right_format));
+                sentimentImage.setImageResource(R.drawable.ic_sentiment_dissatisfied_black_24dp);
+                visibilityImage.setImageResource(R.drawable.ic_visibility_off_black_24dp);
+
+        }
+
+
     }
 
     private void sendRequest(Call<String> call) {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                String dataItems = response.body();
-                Toast.makeText(SearchResultsActivity.this,
-                        "Received " + dataItems + " items from service",
-                        Toast.LENGTH_SHORT).show();
-
+                String message = response.body();
+                messageText.setText(message);
+               /* Toast.makeText(SearchResultsActivity.this,
+                        "Received:  " + "\n" + dataItems,
+                        Toast.LENGTH_SHORT).show();*/
                 //  mItemList = Arrays.asList(dataItems);
                 //displayData();
             }
@@ -210,9 +210,9 @@ public class SearchResultsActivity extends AppCompatActivity {
         });
     }
 
-    private void showSnackbar() {
+    private void showSnackbar(String message) {
         Snackbar snackbar = Snackbar
-                .make(findViewById(R.id.search_layout), R.string.no_internet, Snackbar.LENGTH_LONG)
+                .make(findViewById(R.id.search_layout), message, Snackbar.LENGTH_LONG)
                 .setAction(R.string.retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -227,6 +227,60 @@ public class SearchResultsActivity extends AppCompatActivity {
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.YELLOW);
         snackbar.show();
+    }
+
+    private void spinnerConfig(Spinner spinner) {
+
+        spinner.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+
+                        Query whichView = Query.values()[pos];
+                        App.query = whichView;
+
+                        switch (whichView) {
+                            case MATH_HINT:
+                                setQueryHint = getString(R.string.math_hint);
+                                searchView.setQueryHint(setQueryHint);
+                                break;
+
+                            case TRIVIA_HINT:
+                                setQueryHint = getString(R.string.math_hint);
+                                searchView.setQueryHint(setQueryHint);
+                                break;
+
+                            case DATE_HINT:
+                                setQueryHint = getString(R.string.date_hint);
+                                searchView.setQueryHint(setQueryHint);
+                                break;
+
+                            case RANDOM_MATH_HINT:
+                                setQueryHint = getString(R.string.math_hint);
+                                searchView.setQueryHint(setQueryHint);
+                                break;
+                            case RANDOM_TRIVIA_HINT:
+                                setQueryHint = getString(R.string.math_hint);
+                                searchView.setQueryHint(setQueryHint);
+                                break;
+
+                            case RANDOM_DATE_HINT:
+                                setQueryHint = getString(R.string.math_hint);
+                                searchView.setQueryHint(setQueryHint);
+                                break;
+                            case RANDOM_YEAR_HINT:
+                                setQueryHint = getString(R.string.math_hint);
+                                searchView.setQueryHint(setQueryHint);
+                                break;
+
+                            default:
+                                setQueryHint = getString(R.string.search_hint);
+                                searchView.setQueryHint(setQueryHint);
+                        }
+                    }
+
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
     }
 
     @SuppressLint("NewApi")

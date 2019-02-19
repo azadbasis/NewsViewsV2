@@ -4,7 +4,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="150dp"
     android:layout_marginLeft="5dp"
     android:layout_marginTop="3dp"
     android:layout_marginRight="5dp"
@@ -17,13 +17,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/sentimentImage"
             android:layout_width="wrap_content"
-            android:layout_height="150dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
@@ -39,8 +39,8 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_toEndOf="@+id/imageView"
-            android:layout_toRightOf="@+id/imageView"
+            android:layout_toEndOf="@+id/sentimentImage"
+            android:layout_toRightOf="@+id/sentimentImage"
             android:text="A menu item"
             android:textColor="@android:color/black"
             tools:ignore="HardcodedText" />
@@ -49,10 +49,12 @@
             android:id="@+id/publishText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/imageView"
+            android:layout_toRightOf="@id/sentimentImage"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:text="publish time"
-            android:layout_margin="10dp" />
+            android:layout_margin="5dp"
+           />
 
 
 
