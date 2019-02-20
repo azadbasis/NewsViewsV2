@@ -1,5 +1,6 @@
 package com.newsviewsv2;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,8 +29,14 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +47,7 @@ import com.newsviewsv2.services.MyService;
 import com.newsviewsv2.utils.App;
 import com.newsviewsv2.utils.NetworkHelper;
 import com.newsviewsv2.utils.Operation;
+import com.newsviewsv2.utils.PrefManager;
 import com.newsviewsv2.utils.Query;
 
 import java.net.MalformedURLException;
@@ -73,9 +81,6 @@ public class MainActivity extends AppCompatActivity
 
 
             mItemList = intent.getParcelableArrayListExtra(MyService.MY_SERVICE_PAYLOAD);
-            Toast.makeText(MainActivity.this,
-                    "Received " + mItemList.size() + " items from service",
-                    Toast.LENGTH_SHORT).show();
             displayData();
         }
     };
@@ -104,7 +109,6 @@ public class MainActivity extends AppCompatActivity
         //toggle.syncState();
 
 
-
         SharedPreferences prefs =
                 getSharedPreferences(MainActivity.MY_GLOBAL_PREFS, MODE_PRIVATE);
         String userIdSp = prefs.getString(USER_ID_KEY, "");
@@ -116,8 +120,8 @@ public class MainActivity extends AppCompatActivity
             roundedBitmapDrawable.setCornerRadius(Math.max(bitmap.getWidth(), bitmap.getHeight()) / 2.0f);
             roundedBitmapDrawable.setCircular(true);
             toggle.setHomeAsUpIndicator(roundedBitmapDrawable);
-        }else {
-              toggle.setHomeAsUpIndicator(R.drawable.ic_sentiment_satisfied_black_24dp);
+        } else {
+            toggle.setHomeAsUpIndicator(R.drawable.ic_sentiment_satisfied_black_24dp);
 
         }
 
@@ -165,7 +169,31 @@ public class MainActivity extends AppCompatActivity
         spinner.setAdapter(spinnerAdapter);
         spinnerConfig(spinner);
 
+        PrefManager prefManager = new PrefManager(getApplicationContext());
+        if (App.isFirstTime) {
+            View view = (View) findViewById(R.id.imageView);
+            view.setVisibility(View.VISIBLE);
+            Operation.secondarySplashScreen(view);
+
+        }
+
+        if (!prefManager.isFirstTimeLaunch()) {
+            if (App.isFirstTime) {
+                View view = (View) findViewById(R.id.imageView);
+                view.setVisibility(View.VISIBLE);
+                Operation.secondarySplashScreen(view);
+            } else {
+                View view = (View) findViewById(R.id.imageView);
+                view.setVisibility(View.GONE);
+                App.isFirstTime = true;
+            }
+
+
+        }
+
+
     }
+
 
     private void spinnerConfig(Spinner spinner) {
 
@@ -278,29 +306,36 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(this, SigninActivity.class);
                 startActivityForResult(intent, SIGNIN_REQUEST);
                 return true;
+            case R.id.action_welcome:
+                PrefManager prefManager = new PrefManager(getApplicationContext());
+                // make first time launch TRUE
+                prefManager.setFirstTimeLaunch(true);
+                startActivity(new Intent(this, WelcomeActivity.class));
+                return true;
 
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("NewApi")
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_home) {
+            startActivity(new Intent(this,MainActivity.class));
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_about) {
 
-        } else if (id == R.id.nav_slideshow) {
+            startActivity(new Intent(this,AboutActivity.class));
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_exit) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+            finishAffinity();
+            System.exit(0);
 
         }
 
@@ -346,7 +381,6 @@ public class MainActivity extends AppCompatActivity
 
         if (resultCode == RESULT_OK && requestCode == SIGNIN_REQUEST) {
             userId = data.getStringExtra(USER_ID_KEY);
-            Toast.makeText(this, "You signed in as " + userId, Toast.LENGTH_SHORT).show();
 
             SharedPreferences.Editor editor =
                     getSharedPreferences(MY_GLOBAL_PREFS, MODE_PRIVATE).edit();

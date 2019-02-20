@@ -12,12 +12,14 @@ android {
         //For Gradle Plugin 2.0+
 
         vectorDrawables.useSupportLibrary = true
+        buildConfigField "long", "BUILD_TIME",
+                System.currentTimeMillis() + "L"
 
 
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -42,4 +44,6 @@ dependencies {
     // Retrofit Scalars Converter
     implementation 'com.squareup.retrofit2:converter-scalars:2.5.0'
     implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
+
 }

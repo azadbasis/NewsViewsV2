@@ -1,9 +1,18 @@
 package com.newsviewsv2.utils;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.StrictMode;
+import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
+
+import com.newsviewsv2.R;
 
 import java.io.IOException;
 import java.net.URL;
@@ -105,4 +114,29 @@ public class Operation {
         return bitmap;
     }
 
+
+    public static void secondarySplashScreen(View v) {
+        /*USE SPLASH SCREEEN*/
+//        View v = (View)findViewById(R.id.imageView);
+
+        // Animation animation =new ScaleAnimation(1,5,1,5,.5f,.5f);
+        Animation animation = new TranslateAnimation(0, -1500f, 0, 0);
+        animation.setStartOffset(500);
+        animation.setInterpolator(new AccelerateInterpolator(200));
+        animation.setDuration(5000);
+        animation.setFillAfter(true);
+
+        Animation animation1 = new AlphaAnimation(1f, 0f);
+        animation1.setDuration(2000);
+        animation1.setFillAfter(true);
+
+
+        AnimationSet animationSet = new AnimationSet(true);
+        animationSet.addAnimation(animation);
+
+        animationSet.setDuration(1200);
+        animationSet.setFillAfter(true);
+        v.startAnimation(animationSet);
+        /*USE SPLASH SCREEEN*/
+    }
 }

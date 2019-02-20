@@ -21,4 +21,16 @@
         <dimen name="appBarTopMargin">0dp</dimen>
         <dimen name="statusBarHeight">0dp</dimen>
     <dimen name="statusBarElevation">4dp</dimen>
+
+
+    <dimen name="dots_height">30dp</dimen>
+    <dimen name="dots_margin_bottom">20dp</dimen>
+    <dimen name="img_width_height">120dp</dimen>
+    <dimen name="slide_title">30dp</dimen>
+    <dimen name="slide_desc">16dp</dimen>
+    <dimen name="desc_padding">40dp</dimen>
+    <dimen name="image_final_width">32dp</dimen>
+    <dimen name="logo_side">150dp</dimen>
+    <dimen name="headline_size">24sp</dimen>
+    <dimen name="content_size">14sp</dimen>
 </resources>

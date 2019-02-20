@@ -4,6 +4,10 @@ public class App {
     private static final App ourInstance = new App();
     public static Query query=null;
     public static String userId=null;
+    public static boolean isFirstTime=false;
+
+
+
 
     public static App getInstance() {
         return ourInstance;
