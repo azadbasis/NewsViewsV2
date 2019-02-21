@@ -8,17 +8,19 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true"
     tools:context=".SearchResultsActivity">
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="20dp"
         android:background="?attr/colorPrimary"
-        app:popupTheme="@style/AppTheme.PopupOverlay" >
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
         <Spinner
             android:id="@+id/spinner_toolBar"
             android:layout_width="wrap_content"
-            android:overlapAnchor="false"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:overlapAnchor="false">
 
         </Spinner>
     </android.support.v7.widget.Toolbar>
@@ -43,8 +45,8 @@
 
             <ImageView
                 android:id="@+id/sentimentImage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
@@ -56,25 +58,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_marginStart="0dp"
-                android:layout_marginLeft="0dp"
-                android:layout_marginTop="70dp"
+                android:layout_marginStart="9dp"
+                android:layout_marginLeft="9dp"
+                android:layout_marginTop="29dp"
                 android:layout_toEndOf="@+id/sentimentImage"
                 android:layout_toRightOf="@+id/sentimentImage"
                 android:text="Muhammad Azharul Islam"
-                android:textColor="@android:color/black" />
-
+                android:textColor="@android:color/black"
+                android:textSize="8sp"
+                app:fontFamily="serif-monospace" />
 
 
             <ImageView
                 android:id="@+id/visibilityImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
                 android:layout_marginStart="5dp"
                 android:layout_marginLeft="5dp"
-                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="79dp"
                 app:srcCompat="@drawable/ic_visibility_black_24dp" />
 
 

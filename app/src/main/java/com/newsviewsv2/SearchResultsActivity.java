@@ -33,6 +33,7 @@ import com.newsviewsv2.services.MyWebService;
 import com.newsviewsv2.utils.App;
 import com.newsviewsv2.utils.NetworkHelper;
 import com.newsviewsv2.utils.Operation;
+import com.newsviewsv2.utils.PrefManager;
 import com.newsviewsv2.utils.Query;
 
 import java.util.Arrays;
@@ -76,6 +77,9 @@ public class SearchResultsActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
         spinnerConfig(spinner);
+
+        PrefManager prefManager = new PrefManager(getApplicationContext());
+        prefManager.setSecondTimeLaunch(false);
 
         handleIntent(getIntent());
     }

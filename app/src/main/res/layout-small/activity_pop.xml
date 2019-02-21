@@ -41,30 +41,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginRight="15dp"
                 android:layout_alignParentBottom="true"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="5dp"
+                android:onClick="goWeb"
                 android:scaleType="centerCrop"
                 android:text="Yes"
-                android:onClick="goWeb"
-                android:textSize="20sp"
                 android:textAllCaps="false"
-                android:textColor="#007ED9" />
+                android:textColor="#007ED9"
+                android:textSize="10sp"
+                card_view:fontFamily="monospace" />
 
             <TextView
                 android:id="@+id/btnNo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
-                android:layout_marginBottom="5dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginLeft="15dp"
-                android:scaleType="centerCrop"
+                android:layout_marginBottom="5dp"
                 android:onClick="goBrowser"
+                android:scaleType="centerCrop"
                 android:text="No"
-                android:textSize="20sp"
                 android:textAllCaps="false"
-                android:textColor="#007ED9" />
+                android:textColor="#007ED9"
+                android:textSize="10sp"
+                card_view:fontFamily="monospace" />
 
         </RelativeLayout>
 

@@ -30,6 +30,7 @@
         android:layout_alignParentTop="true"
         android:background="@color/colorPrimaryDark"
         android:scaleType="fitXY"
+        android:visibility="gone"
         app:srcCompat="@drawable/ic_couple_sharing"
         />
 

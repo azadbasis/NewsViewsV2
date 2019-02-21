@@ -7,15 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.IntentCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,18 +24,11 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,8 +42,6 @@ import com.newsviewsv2.utils.Operation;
 import com.newsviewsv2.utils.PrefManager;
 import com.newsviewsv2.utils.Query;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import static com.newsviewsv2.SigninActivity.USER_ID_KEY;
@@ -71,10 +61,10 @@ public class MainActivity extends AppCompatActivity
     private SwipeRefreshLayout swipeContainer;
     private String setQueryHint;
     private SearchView searchView;
-    private String userId;
     private ActionBarDrawerToggle toggle;
     private DrawerLayout drawer;
-
+    private PrefManager prefManager;
+    private Toolbar toolbar;
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -89,10 +79,11 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         networkOk = NetworkHelper.hasNetworkAccess(this);
+        prefManager = new PrefManager(getApplicationContext());
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
@@ -104,26 +95,17 @@ public class MainActivity extends AppCompatActivity
                 drawer.openDrawer(GravityCompat.START);
             }
         });
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-        // drawer.addDrawerListener(toggle);
-        //toggle.syncState();
 
-
-        SharedPreferences prefs =
-                getSharedPreferences(MainActivity.MY_GLOBAL_PREFS, MODE_PRIVATE);
-        String userIdSp = prefs.getString(USER_ID_KEY, "");
-        if (!TextUtils.isEmpty(userIdSp)) {
-
-            Bitmap bitmap = Operation.getFacebookProfilePicture(userIdSp);
-            Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap, 100, 90, false);
-            RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(getResources(), bitmapResized);
-            roundedBitmapDrawable.setCornerRadius(Math.max(bitmap.getWidth(), bitmap.getHeight()) / 2.0f);
-            roundedBitmapDrawable.setCircular(true);
-            toggle.setHomeAsUpIndicator(roundedBitmapDrawable);
+        String userIdSp = prefManager.getUserId();
+        if (networkOk) {
+            Operation.toggleCustomise(this, toggle, userIdSp);
         } else {
-            toggle.setHomeAsUpIndicator(R.drawable.ic_sentiment_satisfied_black_24dp);
-
+            showSnackbar();
         }
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -159,37 +141,14 @@ public class MainActivity extends AppCompatActivity
 
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner_toolBar);
-
-
         // set Spinner Adapter
-
-
         final ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.drawer_drop_down, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
         spinnerConfig(spinner);
 
-        PrefManager prefManager = new PrefManager(getApplicationContext());
-        if (App.isFirstTime) {
-            View view = (View) findViewById(R.id.imageView);
-            view.setVisibility(View.VISIBLE);
-            Operation.secondarySplashScreen(view);
-
-        }
-
-        if (!prefManager.isFirstTimeLaunch()) {
-            if (App.isFirstTime) {
-                View view = (View) findViewById(R.id.imageView);
-                view.setVisibility(View.VISIBLE);
-                Operation.secondarySplashScreen(view);
-            } else {
-                View view = (View) findViewById(R.id.imageView);
-                view.setVisibility(View.GONE);
-                App.isFirstTime = true;
-            }
-
-
-        }
+        View view = (View) findViewById(R.id.imageView);
+        Operation.secondTimeActiveSplashScreen(prefManager, view);
 
 
     }
@@ -250,14 +209,17 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    @SuppressLint("NewApi")
     @Override
     public void onBackPressed() {
+//this.getIntent();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
+
     }
 
     private void displayData() {
@@ -267,6 +229,8 @@ public class MainActivity extends AppCompatActivity
             swipeContainer.setRefreshing(false);
         }
     }
+
+
 
     @Override
     protected void onDestroy() {
@@ -303,15 +267,15 @@ public class MainActivity extends AppCompatActivity
                 return true;
 
             case R.id.action_signin:
-                Intent intent = new Intent(this, SigninActivity.class);
-                startActivityForResult(intent, SIGNIN_REQUEST);
+                if (networkOk) {
+                    Intent intent = new Intent(this, SigninActivity.class);
+                    startActivityForResult(intent, SIGNIN_REQUEST);
+                } else {
+                    showSnackbar();
+                }
+
                 return true;
-            case R.id.action_welcome:
-                PrefManager prefManager = new PrefManager(getApplicationContext());
-                // make first time launch TRUE
-                prefManager.setFirstTimeLaunch(true);
-                startActivity(new Intent(this, WelcomeActivity.class));
-                return true;
+
 
         }
 
@@ -323,14 +287,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            startActivity(new Intent(this,MainActivity.class));
-            // Handle the camera action
+//            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//            drawer.closeDrawer(GravityCompat.START);
+//            return true;            // Handle the camera action
         } else if (id == R.id.nav_about) {
 
-            startActivity(new Intent(this,AboutActivity.class));
+            startActivity(new Intent(this, AboutActivity.class));
 
         } else if (id == R.id.nav_exit) {
 
@@ -354,7 +320,9 @@ public class MainActivity extends AppCompatActivity
         } else {
             showSnackbar();
         }
+
     }
+
 
     private void showSnackbar() {
         Snackbar snackbar = Snackbar
@@ -380,14 +348,13 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK && requestCode == SIGNIN_REQUEST) {
-            userId = data.getStringExtra(USER_ID_KEY);
-
-            SharedPreferences.Editor editor =
-                    getSharedPreferences(MY_GLOBAL_PREFS, MODE_PRIVATE).edit();
-            editor.putString(USER_ID_KEY, userId);
-            editor.apply();
-
+            String userId = data.getStringExtra(USER_ID_KEY);
+            prefManager.setUserId(userId);
+            Operation.toggleCustomise(this, toggle, userId);
         }
 
     }
+
+
+
 }

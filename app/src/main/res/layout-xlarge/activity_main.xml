@@ -31,6 +31,7 @@
         android:background="@color/colorPrimaryDark"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/ic_couple_sharing"
+        android:visibility="gone"
         />
 
 

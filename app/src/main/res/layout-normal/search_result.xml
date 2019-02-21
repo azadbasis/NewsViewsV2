@@ -62,7 +62,8 @@
                 android:layout_toEndOf="@+id/sentimentImage"
                 android:layout_toRightOf="@+id/sentimentImage"
                 android:text="Muhammad Azharul Islam"
-                android:textColor="@android:color/black" />
+                android:textColor="@android:color/black"
+                app:fontFamily="serif-monospace" />
 
 
 

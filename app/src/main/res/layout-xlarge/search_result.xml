@@ -30,7 +30,7 @@
         card_view:cardElevation="2dp"
         card_view:cardUseCompatPadding="true"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="400dp">
 
         <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -43,8 +43,8 @@
 
             <ImageView
                 android:id="@+id/sentimentImage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
@@ -56,9 +56,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_marginStart="0dp"
-                android:layout_marginLeft="0dp"
-                android:layout_marginTop="70dp"
+                android:layout_marginStart="48dp"
+                android:layout_marginLeft="48dp"
+                android:layout_marginTop="175dp"
                 android:layout_toEndOf="@+id/sentimentImage"
                 android:layout_toRightOf="@+id/sentimentImage"
                 android:text="Muhammad Azharul Islam"
@@ -68,8 +68,8 @@
 
             <ImageView
                 android:id="@+id/visibilityImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginStart="5dp"

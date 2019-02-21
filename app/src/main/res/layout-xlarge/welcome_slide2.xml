@@ -13,8 +13,8 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="@dimen/img_width_height"
-            android:layout_height="@dimen/img_width_height"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
             app:srcCompat="@drawable/ic_news_paper" />
 
         <TextView
@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:text="@string/slide_2_title"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/slide_title"
+            android:textSize="60dp"
 
             android:textStyle="bold"
             app:fontFamily="cursive" />

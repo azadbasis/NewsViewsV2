@@ -43,18 +43,25 @@
             android:layout_toRightOf="@+id/sentimentImage"
             android:text="A menu item"
             android:textColor="@android:color/black"
+            android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/publishText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/sentimentImage"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toRightOf="@id/sentimentImage"
             android:text="publish time"
-            android:layout_margin="5dp"
-           />
+            android:textSize="28sp"
+            app:fontFamily="cursive" />
 
 
 

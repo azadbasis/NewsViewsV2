@@ -1,10 +1,15 @@
 package com.newsviewsv2.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.StrictMode;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -139,4 +144,46 @@ public class Operation {
         v.startAnimation(animationSet);
         /*USE SPLASH SCREEEN*/
     }
+
+
+    public static void toggleCustomise(Context context, ActionBarDrawerToggle toggle,String userId ) {
+        if (!TextUtils.isEmpty(userId)) {
+
+            Bitmap bitmap = Operation.getFacebookProfilePicture(userId);
+            Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap, 90, 90, false);
+            RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), bitmapResized);
+            roundedBitmapDrawable.setCornerRadius(Math.max(bitmap.getWidth(), bitmap.getHeight()) / 2.0f);
+            roundedBitmapDrawable.setCircular(true);
+            toggle.setHomeAsUpIndicator(roundedBitmapDrawable);
+        } else {
+            toggle.setHomeAsUpIndicator(R.drawable.ic_sentiment_satisfied_black_24dp);
+
+        }
+    }
+
+    public static void secondTimeActiveSplashScreen(PrefManager prefManager,View view) {
+        boolean isSecondTimeLaunch = prefManager.isSecondTimeLaunch();
+
+        if (isSecondTimeLaunch) {
+            view.setVisibility(View.VISIBLE);
+            Operation.secondarySplashScreen(view);
+
+        }
+
+        if (!prefManager.isFirstTimeLaunch()) {
+            if (isSecondTimeLaunch) {
+                view.setVisibility(View.VISIBLE);
+                Operation.secondarySplashScreen(view);
+            } else {
+                view.setVisibility(View.GONE);
+                isSecondTimeLaunch = true;
+                prefManager.setSecondTimeLaunch(isSecondTimeLaunch);
+            }
+
+
+        }
+    }
+
+
+
 }
